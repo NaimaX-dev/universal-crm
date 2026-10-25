@@ -1,0 +1,21 @@
+--- status:
+{"data":{"configured":true,"driver":"smtp","from":"crm@example.test","businessEmailEnabled":true,"recent":[]}}
+--- run 1:
+{'configured': True, 'total': 2, 'sent': 2, 'failed': 0, 'skipped': 0, 'message': '2 email(s) accepted by the mail server, 0 failed.'}
+--- run 2 (no duplicates expected):
+{'configured': True, 'total': 0, 'sent': 0, 'failed': 0, 'skipped': 0, 'message': 'No follow-ups need a reminder right now.'}
+--- what the fake SMTP server received:
+['RCPT TO:<bilal@northwind.demo>'] | Follow-up due: Kamran Ali | Hello Bilal Rauf,  This is a reminder from Northwind Clinic (demo).  F
+['RCPT TO:<hina@northwind.demo>'] | Follow-up due: Sana Iqbal | Hello Hina Siddiqui,  This is a reminder from Northwind Clinic (demo).
+status	n
+sent	2
+followups_marked_reminded
+2
+--- failure case (SMTP port closed):
+{'total': 2, 'sent': 0, 'failed': 2, 'skipped': 0, 'message': '0 email(s) accepted by the mail server, 2 failed.'}
+Cannot connect to SMTP server 127.0.0.1:2599 (Connection refused)
+wrongly_marked_reminded_after_failure
+0
+--- CLI script:
+[Northwind Clinic (demo)] due: 2, sent: 0, failed: 0, not sent: 2. Email is not configured on the server, so NO emails were sent. Set MAIL_DRIVER=smtp and the MAIL_* values in backend/.env.
+[Skyline Travels (demo)] due: 0, sent: 0, failed: 0, not sent: 0. No follow-ups need a reminder right now.

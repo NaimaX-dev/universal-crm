@@ -1,0 +1,4 @@
+health:      {"data":{"ok":true,"time":"2026-10-16 10:51:14"}}
+root hidden: 403 (.env) 404 (src/Db.php) 404 (bin)
+public path: {"data":{"ok":true,"time":"2026-10-16 10:51:14"}}
+== 148 passed, 0 failed ==

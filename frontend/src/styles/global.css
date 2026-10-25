@@ -1,0 +1,13 @@
+* { box-sizing: border-box; }
+html { -webkit-text-size-adjust: 100%; }
+body { margin: 0; font-family: var(--font); background: var(--bg); color: var(--text); font-size: 13.5px; line-height: 1.45; -webkit-font-smoothing: antialiased; }
+h1, h2, h3, h4, p { margin: 0; }
+button { font: inherit; }
+a { color: var(--primary); }
+:focus-visible { outline: 2px solid var(--primary); outline-offset: 2px; }
+.grow { flex: 1; min-width: 0; } .muted { color: var(--muted); font-size: 12.5px; } .strong { font-weight: 600; }
+.right { text-align: right; } .nowrap { white-space: nowrap; }
+.code { background: var(--bd-2); padding: 2px 7px; border-radius: 6px; font-size: 12px; }
+.row-gap { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
+.mt { margin-top: 14px; } .mb { margin-bottom: 14px; }
+@media (prefers-reduced-motion: reduce) { *, *::before, *::after { animation-duration: .001ms !important; animation-iteration-count: 1 !important; transition-duration: .001ms !important; } }

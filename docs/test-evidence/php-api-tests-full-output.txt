@@ -1,0 +1,151 @@
+== Universal CRM API tests (http://127.0.0.1:8000) run 78f23a ==
+PASS health endpoint reaches the database
+PASS unknown route returns 404 JSON
+PASS empty login rejected (422)
+PASS malformed JSON body rejected (400)
+PASS protected endpoint without token returns 401
+PASS protected endpoint with invalid token returns 401
+PASS CORS preflight allowed for the configured origin
+PASS CORS not granted to an unknown origin
+PASS wrong password rejected (401)
+PASS SQL injection in login is rejected, no server error
+PASS Admin login works (seed data)
+PASS Agent (assigned scope) login works
+PASS Agent (all scope) login works
+PASS second business Admin login works
+PASS /auth/me returns user, role and business
+PASS logout invalidates the token (401 afterwards)
+PASS repeated failed logins are throttled (429)
+PASS business self-registration creates business + Admin and signs in
+PASS duplicate admin email rejected on registration
+PASS weak password rejected on registration
+PASS tokens are stored hashed (plain token not in DB)
+PASS passwords are stored as secure hashes
+PASS customer validation errors (422 with field messages)
+PASS create customer
+PASS duplicate customer (same phone, different format) returns 409 DUPLICATE
+PASS duplicate can be created when explicitly allowed
+PASS duplicate check endpoint finds existing customer
+PASS update customer
+PASS search + pagination (meta.total counts all matches)
+PASS SQL injection in search is harmless
+PASS deactivate customer
+PASS delete customer without records succeeds
+PASS business B can create its own customer
+PASS isolation: B cannot read A's customer by id (404)
+PASS isolation: B cannot update A's customer
+PASS isolation: B cannot delete A's customer
+PASS isolation: B cannot see A's customer in lists/search
+PASS isolation: B cannot read A's customer overview
+PASS isolation: B cannot create a lead for A's customer
+PASS isolation: B cannot create a quotation for A's customer
+PASS isolation: B cannot schedule a follow-up for A's customer
+PASS isolation: demo business Skyline cannot read Northwind customer
+PASS isolation: other business cannot read an invoice, payments or receipts
+PASS isolation: lists of other business are empty of foreign data
+PASS agent creation validates password strength
+PASS Admin creates an Agent with permissions
+PASS new Agent can sign in
+PASS Agent cannot manage Agents (403)
+PASS Agent cannot change business settings (403)
+PASS Agent without payments permission gets 403 on /payments
+PASS Agent without invoices permission gets 403 on /invoices
+PASS Agent without delete permission cannot delete/deactivate customers
+PASS Agent without create permission cannot create services
+PASS Agent cannot see admin-only activity log or agent report
+PASS assigned-scope Agent sees no customers they do not own
+PASS Agent can create a customer (auto-assigned to self) and sees it
+PASS Agent cannot reassign customers to others
+PASS permission change takes effect immediately (no re-login)
+PASS deactivating an Agent blocks their existing session at once
+PASS demo Agent Bilal (assigned) sees only his customers, Hina (all) sees all
+PASS demo Agent Bilal has no payments permission
+PASS create lead with a brand-new customer
+PASS creating a lead with a duplicate new customer is blocked (409)
+PASS invalid inquiry source rejected
+PASS closing a lead requires a reason
+PASS lead status change works
+PASS lead history records creation and status change
+PASS lead filters (status + source)
+PASS lead closed with reason keeps lost_reason
+PASS follow-up requires a valid date/time
+PASS create follow-up
+PASS a past scheduled follow-up is shown as overdue
+PASS overdue / upcoming views work
+PASS lead.nextFollowUp is kept in sync with scheduled follow-ups
+PASS completing a follow-up requires an outcome
+PASS complete follow-up
+PASS completed follow-up cannot be completed again (409)
+PASS reschedule follow-up
+PASS email reminders: with email NOT configured nothing is reported as sent
+PASS only an Admin can trigger reminder emails
+PASS delete follow-up
+PASS create service with duration
+PASS negative price rejected
+PASS create package with services
+PASS service used by a package cannot be deleted (409)
+PASS catalog is business-specific
+PASS quotation totals are calculated by the server (subtotal/discount/tax/total)
+PASS quotation gets a unique sequential number
+PASS client-sent totals are ignored (server recalculates)
+PASS invalid line item (qty 0) rejected
+PASS quotation needs at least one line
+PASS quotation expiry before date rejected
+PASS cannot convert a draft quotation (409)
+PASS quotation status flow draft -> sent -> accepted
+PASS a sent quotation past its expiry date is reported as expired
+PASS convert accepted quotation -> issued invoice with identical totals and items
+PASS original quotation is preserved and linked to the invoice
+PASS a quotation cannot be converted twice (409) or edited after conversion
+PASS new issued invoice has number, balance = total, status issued
+PASS partial payment recorded with receipt number
+PASS invoice shows partially paid with correct balance
+PASS duplicate transaction/reference ID is rejected
+PASS payment exceeding the remaining balance is rejected
+PASS zero / negative / non-numeric amounts rejected
+PASS payment against another business's invoice is rejected
+PASS invoice with payments cannot be edited or cancelled (409)
+PASS second partial payment OK
+PASS pending payment not allowed above the remaining balance
+PASS invoice becomes paid when balance reaches zero; payment history kept
+PASS payments cannot be added to a fully paid invoice
+PASS voiding a payment requires a reason
+PASS void payment
+PASS voided payment is excluded: balance restored, history preserved
+PASS transaction ID of a voided payment can be reused
+PASS receipt data available
+PASS pending payment does not reduce the balance
+PASS confirm pending payment
+PASS invoice drafts cannot receive payments
+PASS issue then cancel a draft invoice
+PASS unpaid issued invoice past due date is reported as overdue
+PASS concurrent payments cannot over-pay (exactly one wins, balance never negative)
+PASS create subscription (price defaults to the plan price)
+PASS manual renewal creates an issued invoice and moves the next billing date
+PASS subscription shows associated invoices and history
+PASS pause subscription; paused cannot be renewed (409)
+PASS subscription past its end date is reported as expired
+PASS cancelled subscription cannot be reactivated
+PASS purchase totals calculated (2 x 100 less 5% = 190)
+PASS payment against a purchase
+PASS purchase becomes partial then paid
+PASS purchase with payments cannot be edited or cancelled
+PASS customer overview aggregates leads, follow-ups, quotations, invoices, purchases, payments, subscriptions, history
+PASS dashboard figures come from the database (payments received matches SQL)
+PASS dashboard invoice/subscription/follow-up/lead sections present
+PASS payments report total equals dashboard received amount
+PASS outstanding report equals dashboard outstanding (invoices + open purchases)
+PASS invoice report summary is consistent (invoiced - paid = outstanding)
+PASS all 10 report types return data with date filters
+PASS report date filter excludes out-of-range rows
+PASS Admin activity log lists important actions
+PASS activity log is isolated per business
+PASS business profile validation
+PASS invalid business email rejected
+PASS update business profile and settings
+PASS email reminders respect the "email notifications" setting
+PASS changing password requires the correct current password
+PASS password change works
+PASS data persists across sessions (new login sees earlier records)
+
+== 148 passed, 0 failed ==

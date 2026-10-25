@@ -1,0 +1,43 @@
+=== PHP API TESTS ===
+== 148 passed, 0 failed ==
+=== BROWSER TESTS (React -> PHP -> MySQL) ===
+PASS wrong password shows the server error
+PASS admin dashboard loads from real API
+PASS no demo banner/labels in the app shell
+PASS dashboard shows database totals
+PASS session and data persist after browser refresh
+PASS customer created in database and listed
+PASS server duplicate detection shows a warning
+PASS client validation messages
+PASS customer still there after reload (persisted) and search works
+PASS customer deleted (no records)
+PASS customer with records cannot be deleted (server message)
+PASS customer detail page with history
+PASS lead + new customer created with priority
+PASS closing a lead requires a reason
+PASS lead closed (history persisted)
+PASS follow-up completed via API and listed with outcome
+PASS quotation saved; server-calculated totals shown (2 x 90 less 10% + 5% tax = 170.10)
+PASS converted to invoice with the same total
+PASS partial payment recorded; balance 100.00
+PASS duplicate transaction ID rejected by server
+PASS over-payment rejected
+PASS full payment makes the invoice Paid
+PASS receipt page
+PASS renewal invoice listed
+PASS email panel says not configured
+PASS reminder run does not claim emails were sent
+PASS business profile saved to DB
+PASS activity log shows recorded actions
+PASS agent created
+PASS new Agent: limited menu
+PASS Agent blocked from payments page
+PASS Agent Bilal sees only assigned customers
+PASS other business sees only its own customers
+PASS business registered through the UI and signed in
+PASS new business starts empty
+PASS mobile menu opens
+PASS 404 page
+PASS API down: error shown, no success message
+CONSOLE ERRORS: []
+FAILS: []

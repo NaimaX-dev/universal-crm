@@ -1,0 +1,28 @@
+# Dependencies
+node_modules/
+**/node_modules/
+vendor/
+**/vendor/
+
+# Build files
+dist/
+**/dist/
+
+# Environment and secrets
+.env
+.env.*
+**/.env
+**/.env.*
+!.env.example
+!**/.env.example
+*.pem
+*.key
+
+# Backend storage
+backend/storage/
+backend/tests/last_results.json
+
+# Logs and system files
+*.log
+.DS_Store
+Thumbs.db

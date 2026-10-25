@@ -1,0 +1,13 @@
+# Optional: lets you serve the whole backend folder from Apache (e.g. htdocs/crm-api) and use
+# http://localhost/crm-api as the API URL. Only the public/ folder is reachable; src/, .env, bin/ are not.
+<IfModule mod_rewrite.c>
+  RewriteEngine On
+  RewriteCond %{HTTP:Authorization} .
+  RewriteRule .* - [E=HTTP_AUTHORIZATION:%{HTTP:Authorization}]
+  RewriteRule ^$ public/index.php [L]
+  RewriteCond %{REQUEST_URI} !/public/
+  RewriteRule ^(.*)$ public/index.php [L]
+</IfModule>
+<FilesMatch "^\.env">
+  Require all denied
+</FilesMatch>

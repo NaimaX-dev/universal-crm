@@ -1,0 +1,17 @@
+/* Colour scheme and design tokens copied from the Dizoora internship project.
+   Change a value here and the whole app updates. */
+:root {
+  --primary: #4F46E5; --primary-600: #4338CA; --primary-50: #EEF2FF; --primary-100: #E0E7FF;  /* indigo brand (was blue: #2563EB / #1D4ED8 / #EFF6FF / #DBEAFE) */
+  --secondary: #0F172A; --bg: #F8FAFC; --card: #FFFFFF;
+  --ok: #10B981; --ok-50: #ECFDF5; --warn: #F59E0B; --warn-50: #FFFBEB; --err: #EF4444; --err-50: #FEF2F2;
+  --text: #0F172A; --text-2: #475569; --muted: #64748B; --bd: #E2E8F0; --bd-2: #F1F5F9;
+  --r: 12px; --r-sm: 9px;
+  --shadow-sm: 0 1px 2px rgba(15,23,42,.05); --shadow: 0 4px 16px rgba(15,23,42,.06); --shadow-lg: 0 14px 36px rgba(15,23,42,.12);
+  --sw: 240px; --sw-c: 72px;
+  --font: 'Plus Jakarta Sans', Inter, system-ui, -apple-system, 'Segoe UI', sans-serif;
+  /* Premium accent palette (used by auth pages now; reuse on dashboard/buttons later) */
+  --indigo: #4F46E5; --violet: #7C3AED; --teal: #14B8A6; --navy-deep: #1E1B4B;
+  --grad: linear-gradient(135deg, #4F46E5 0%, #7C3AED 100%);
+  --grad-teal: linear-gradient(135deg, #2563EB 0%, #14B8A6 100%);
+  --ring: 0 0 0 4px rgba(99,102,241,.2);
+}
