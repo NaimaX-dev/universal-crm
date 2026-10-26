@@ -57,7 +57,7 @@ final class UsersController
         $u = Auth::require($r); Perm::needAdmin($u);
         $v = self::validate($r->body, null);
         $id = Db::insert("INSERT INTO users (business_id, name, email, phone, password_hash, role, status, scope, permissions, created_at, updated_at) VALUES (:b, :n, :e, :ph, :h, 'agent', 'active', :s, :perm, :now, :now)", [
-            'b' => $u['business_id'], 'n' => $v['name'], 'e' => $v['email'], 'ph' => $v['phone'], 'h' => Auth::hash($v['password']), 's' => $v['scope'], 'perm' => json_encode($v['permissions']), 'now' => Util::now(),
+            'b' => $u['business_id'], 'n' => $v['name'], 'e' => $v['email'], 'ph' => $v['phone'], 'h' => Auth::store($v['password']), 's' => $v['scope'], 'perm' => json_encode($v['permissions']), 'now' => Util::now(),
         ]);
         Activity::log($u, 'create', 'agent', $id, "Agent {$v['name']} created");
         return Auth::publicUser(self::agent($u, (string)$id));
@@ -69,7 +69,7 @@ final class UsersController
         $a = self::agent($u, $p['id']);
         $v = self::validate($r->body, $a);
         Db::exec('UPDATE users SET name = :n, email = :e, phone = :ph, scope = :s, permissions = :perm, updated_at = :now WHERE id = :id', ['n' => $v['name'], 'e' => $v['email'], 'ph' => $v['phone'], 's' => $v['scope'], 'perm' => json_encode($v['permissions']), 'now' => Util::now(), 'id' => $a['id']]);
-        if ($v['password'] !== '') { Db::exec('UPDATE users SET password_hash = :h WHERE id = :id', ['h' => Auth::hash($v['password']), 'id' => $a['id']]); Auth::revokeAll((int)$a['id']); }
+        if ($v['password'] !== '') { Db::exec('UPDATE users SET password_hash = :h WHERE id = :id', ['h' => Auth::store($v['password']), 'id' => $a['id']]); Auth::revokeAll((int)$a['id']); }
         Activity::log($u, 'update', 'agent', (int)$a['id'], "Agent {$v['name']} updated");
         return Auth::publicUser(self::agent($u, $p['id']));
     }

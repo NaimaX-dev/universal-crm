@@ -56,7 +56,7 @@ final class AuthController
             $bid = Db::insert('INSERT INTO businesses (name, type, settings, created_at, updated_at) VALUES (:n, :t, :s, :now, :now)', ['n' => $name, 't' => $type, 's' => json_encode(Biz::defaultSettings($name)), 'now' => $now]);
             $perms = [];
             foreach (Perm::MODULES as $m => $actions) { foreach ($actions as $a) { $perms[$m][$a] = true; } }
-            $uid = Db::insert('INSERT INTO users (business_id, name, email, password_hash, role, status, scope, permissions, created_at, updated_at) VALUES (:b, :n, :e, :h, \'admin\', \'active\', \'all\', :p, :now, :now)', ['b' => $bid, 'n' => $adminName, 'e' => strtolower($email), 'h' => Auth::hash($password), 'p' => json_encode($perms), 'now' => $now]);
+            $uid = Db::insert('INSERT INTO users (business_id, name, email, password_hash, role, status, scope, permissions, created_at, updated_at) VALUES (:b, :n, :e, :h, \'admin\', \'active\', \'all\', :p, :now, :now)', ['b' => $bid, 'n' => $adminName, 'e' => strtolower($email), 'h' => Auth::store($password), 'p' => json_encode($perms), 'now' => $now]);
             $user = Db::one('SELECT * FROM users WHERE id = :id', ['id' => $uid]);
             $user['permissions'] = $perms;
             Activity::log($user, 'create', 'business', $bid, 'Business and Admin account created');
@@ -78,13 +78,13 @@ final class AuthController
         $new = is_string($b['newPassword'] ?? null) ? $b['newPassword'] : '';
         if ($new !== '') {
             $cur = is_string($b['currentPassword'] ?? null) ? $b['currentPassword'] : '';
-            if (!password_verify($cur, $u['password_hash'])) { $e['currentPassword'] = 'Current password is incorrect.'; }
+            if (!Auth::verify($cur, (string)$u['password_hash'])) { $e['currentPassword'] = 'Current password is incorrect.'; }
             if ($m = Auth::passwordErrors($new)) { $e['newPassword'] = $m; }
         }
         if ($e) { throw ApiException::validation($e); }
         Db::exec('UPDATE users SET name = :n, phone = :p, updated_at = :now WHERE id = :id', ['n' => $name, 'p' => mb_substr($phone, 0, 40), 'now' => Util::now(), 'id' => $u['id']]);
         if ($new !== '') {
-            Db::exec('UPDATE users SET password_hash = :h WHERE id = :id', ['h' => Auth::hash($new), 'id' => $u['id']]);
+            Db::exec('UPDATE users SET password_hash = :h WHERE id = :id', ['h' => Auth::store($new), 'id' => $u['id']]);
             Auth::revokeAll((int)$u['id'], Auth::currentTokenHash());
             Activity::log($u, 'password', 'user', (int)$u['id'], 'Changed own password');
         }

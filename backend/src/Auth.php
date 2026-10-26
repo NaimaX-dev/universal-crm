@@ -22,6 +22,49 @@ final class Auth
 
     public static function hash(string $pw): string { return password_hash($pw, PASSWORD_DEFAULT); }
 
+    /** Reads a .env value and drops a trailing "   # comment" (the shipped .env.example uses those). */
+    private static function envValue(string $key, string $default = ''): string
+    {
+        $v = (string)(Env::get($key, $default) ?? $default);
+        return trim((string)preg_replace('/\s+#.*$/', '', $v));
+    }
+
+    /**
+     * How new/changed passwords are written to users.password_hash.
+     *   'hash'  (default) - password_hash(); the only mode that is safe for real data or a public server.
+     *   'plain' - readable text, for restricted local testing ONLY. It is active only when ALL of these are true:
+     *             PASSWORD_STORAGE=plain, APP_ENV=local, and PLAIN_PASSWORD_ALLOWED_DB equals DB_NAME.
+     * Anything else silently falls back to 'hash' (fails safe).
+     */
+    public static function storageMode(): string
+    {
+        if (strtolower(self::envValue('PASSWORD_STORAGE', 'hash')) !== 'plain') { return 'hash'; }
+        $allowedDb = self::envValue('PLAIN_PASSWORD_ALLOWED_DB');
+        if (strtolower(self::envValue('APP_ENV')) !== 'local' || $allowedDb === '' || $allowedDb !== self::envValue('DB_NAME')) {
+            static $warned = false;
+            if (!$warned) { $warned = true; error_log('[Universal CRM] PASSWORD_STORAGE=plain ignored: needs APP_ENV=local and PLAIN_PASSWORD_ALLOWED_DB equal to DB_NAME. Using secure hashing.'); }
+            return 'hash';
+        }
+        return 'plain';
+    }
+
+    /** The value to save in users.password_hash for a new or changed password. */
+    public static function store(string $pw): string { return self::storageMode() === 'plain' ? $pw : self::hash($pw); }
+
+    /** True when $stored is a genuine password_hash() value (bcrypt/argon), as opposed to readable text. */
+    private static function isHash(string $stored): bool { return password_get_info($stored)['algo'] !== null; }
+
+    /**
+     * Checks a password against users.password_hash. Real hashes (every existing user) are always verified with
+     * password_verify(). Readable text is accepted only while plain mode is active.
+     */
+    public static function verify(string $pw, string $stored): bool
+    {
+        if ($stored === '') { return false; }
+        if (self::isHash($stored)) { return password_verify($pw, $stored); }
+        return self::storageMode() === 'plain' && hash_equals($stored, $pw);
+    }
+
     public static function issueToken(int $userId, Request $req): string
     {
         $token = bin2hex(random_bytes(32));
@@ -44,12 +87,12 @@ final class Auth
         if ($fails >= 8) { throw new ApiException(429, 'Too many failed sign-in attempts. Please wait 15 minutes and try again.'); }
 
         $u = Db::one('SELECT u.*, b.status AS business_status FROM users u JOIN businesses b ON b.id = u.business_id WHERE u.email = :e', ['e' => $email]);
-        $ok = $u && password_verify($password, $u['password_hash']);
+        $ok = $u && self::verify($password, (string)$u['password_hash']);
         Db::exec('INSERT INTO login_attempts (email, ip, success, created_at) VALUES (:e, :ip, :s, :now)', ['e' => $email, 'ip' => $req->ip(), 's' => $ok ? 1 : 0, 'now' => Util::now()]);
         if (!$ok) { throw new ApiException(401, 'Invalid email or password.'); }
         if ($u['status'] !== 'active') { throw new ApiException(403, 'This account has been deactivated. Contact your Admin.'); }
         if ($u['business_status'] !== 'active') { throw new ApiException(403, 'This business account is inactive.'); }
-        if (password_needs_rehash($u['password_hash'], PASSWORD_DEFAULT)) {
+        if (self::isHash((string)$u['password_hash']) && password_needs_rehash($u['password_hash'], PASSWORD_DEFAULT)) {
             Db::exec('UPDATE users SET password_hash = :h WHERE id = :id', ['h' => self::hash($password), 'id' => $u['id']]);
         }
         Db::exec('UPDATE users SET last_login_at = :now WHERE id = :id', ['now' => Util::now(), 'id' => $u['id']]);
@@ -87,7 +130,7 @@ final class Auth
 
     public static function currentTokenHash(): ?string { return self::$tokenHash; }
 
-    /** API shape of a user (never includes the password hash). */
+    /** API shape of a user (never includes the stored password value). */
     public static function publicUser(array $u): array
     {
         $perms = $u['permissions'];
